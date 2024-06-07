@@ -6,13 +6,17 @@ import {
   getGroqApiKey,
   getOllamaApiEndpoint,
   getOpenaiApiKey,
+  getOpenrouterApiEndpoint,
+  getOpenrouterApiKey,
 } from '../config';
 import logger from '../utils/logger';
 
 export const getAvailableChatModelProviders = async () => {
   const openAIApiKey = getOpenaiApiKey();
   const groqApiKey = getGroqApiKey();
+  const openRouterApiKey = getOpenrouterApiKey();
   const ollamaEndpoint = getOllamaApiEndpoint();
+  const openrouterEndpoint = getOpenrouterApiEndpoint();
 
   const models = {};
 
@@ -115,6 +119,39 @@ export const getAvailableChatModelProviders = async () => {
     } catch (err) {
       logger.error(`Error loading Ollama models: ${err}`);
     }
+  }
+
+  if (openrouterEndpoint) {
+    try {
+      const response = await fetch(`${openrouterEndpoint}/tags`, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const { models: openrouterModels } = (await response.json()) as any;
+
+      models['openrouter'] = openrouterModels.reduce((acc, model) => {
+        acc[model.model] = new ChatOpenAI({
+          openAIApiKey: openRouterApiKey,
+          baseUrl: openrouterEndpoint,
+          model: model.model,
+          temperature: 0.7,
+        }, {
+          basePath: openrouterEndpoint,
+          baseOptions: {
+            headers: {
+              "HTTP-Referer": "https://localhost:3000/",
+              "X-Title": "Perplexia",
+            },
+          },
+        });
+        return acc;
+      }, {});
+    } catch (err) {
+      logger.error(`Error loading OpenRouter models: ${err}`);
+    }
+
   }
 
   models['custom_openai'] = {};

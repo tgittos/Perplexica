@@ -12,10 +12,12 @@ interface Config {
   API_KEYS: {
     OPENAI: string;
     GROQ: string;
+    OPENROUTER: string;
   };
   API_ENDPOINTS: {
     SEARXNG: string;
     OLLAMA: string;
+    OPENROUTER: string;
   };
 }
 
@@ -37,9 +39,13 @@ export const getOpenaiApiKey = () => loadConfig().API_KEYS.OPENAI;
 
 export const getGroqApiKey = () => loadConfig().API_KEYS.GROQ;
 
+export const getOpenrouterApiKey = () => loadConfig().API_KEYS.OPENROUTER;
+
 export const getSearxngApiEndpoint = () => loadConfig().API_ENDPOINTS.SEARXNG;
 
 export const getOllamaApiEndpoint = () => loadConfig().API_ENDPOINTS.OLLAMA;
+
+export const getOpenrouterApiEndpoint = () => loadConfig().API_ENDPOINTS.OPENROUTER;
 
 export const updateConfig = (config: RecursivePartial<Config>) => {
   const currentConfig = loadConfig();
